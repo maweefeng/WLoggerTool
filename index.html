@@ -1,0 +1,164 @@
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <script src="https://unpkg.com/vue@next"></script>
+  <!-- import CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-plus"></script>
+  <title>日志分析终端</title>
+</head>
+
+<body>
+  <div id="app">
+    <div align="center">
+      <el-input id="input01" type="text" placeholder="请选择文件" v-model="fileName"></el-input>
+      <p></p>
+      <el-button type="primary" v-on:click="openFile()" round>选择文件</el-button>
+      <input type="file" id="fileInput" style="display:none" @change="showRealPath" />
+    </div>
+    <div>
+      <!-- <input id="input01" type="file" @change="showRealPath" /> -->
+    </div>
+    <p></p>
+
+    <el-button @click="allLog">所有日志</el-button>
+    <el-button @click="filterError">错误日志</el-button>
+    <el-button @click="clearFilter">清除所有过滤器</el-button>
+    <el-input v-model="input" placeholder="请输入内容" style="width: 200; margin-left: 15;" size="medium"></el-input>
+    <p></p>
+    <el-table ref="filterTable" :data="tableData" style="width: 100%" id="filterTable">
+      <el-table-column prop="date" label="时间" sortable width="180" column-key="date"
+        :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
+        :filter-method="filterHandler">
+      </el-table-column>
+      <el-table-column prop="module" label="模块" width="180">
+      </el-table-column>
+      <el-table-column prop="event" label="事件" width="180">
+      </el-table-column>
+      <el-table-column prop="stage" label="阶段" width="180">
+      </el-table-column>
+      <el-table-column prop="status" label="状态" width="180">
+      </el-table-column>
+      <el-table-column prop="info" label="附加信息" width="180">
+      </el-table-column>
+      <el-table-column prop="tag" label="日志等级" width="100" :filters="logLevel" :filter-method="filterTag"
+        filter-placement="bottom-end">
+      </el-table-column>
+    </el-table>
+  </div>
+  <script>
+    const App = {
+      data() {
+        return {
+          input: '',
+          fileName: '',
+          tableData: [],
+          logLevel: [{
+              text: 'ERROR',
+              value: 'ERROR'
+            },
+            {
+              text: 'WARNING',
+              value: 'WARNING'
+            },
+            {
+              text: 'VERBOSE',
+              value: 'VERBOSE'
+            },
+            {
+              text: 'DEBUG',
+              value: 'DEBUG'
+            },
+            {
+              text: 'INFO',
+              value: 'INFO'
+            }
+          ],
+          allData: [{
+            date: '2016-05-02',
+            module: 'WebKit',
+            event: 'beginLoad',
+            stage: 'willLoad',
+            status: 'Succ',
+            info: 'url = https://www.kdocs.cn/m',
+            tag: 'ERROR'
+          }, {
+            date: '2016-05-04',
+            module: 'WebKit',
+            event: 'beginLoad',
+            stage: 'didUpdateProgress',
+            status: 'Succ',
+            info: 'url = https://www.kdocs.cn/m',
+            tag: 'WARNING'
+          }, {
+            date: '2016-05-01',
+            module: 'WebKit',
+            event: 'beginLoad',
+            stage: 'decidePolicyForNavigationAction',
+            status: 'Succ',
+            info: 'url = https://www.kdocs.cn/m',
+            tag: 'VERBOSE'
+          }, {
+            date: '2016-05-03',
+            module: 'WebKit',
+            event: 'beginLoad',
+            stage: 'didReceiveChallenge',
+            status: 'Fail',
+            info: 'url = https://www.kdocs.cn/m',
+            tag: 'DEBUG'
+          }]
+        }
+      },
+      methods: {
+        clearFilter() {
+          this.$refs.filterTable.clearFilter();
+          this.tableData = this.allData;
+        },
+        formatter(row, column) {
+          return row.address;
+        },
+        allLog() {
+          this.tableData = this.allData;
+        },
+        filterError: function () {
+          var datas1 = [{}]
+          for (var i = 0; i < this.allData.length; i++) {
+            if (this.allData[i]['status'] == 'Fail') {
+              datas1.push(this.allData[i]);
+            };
+          }
+          this.tableData = datas1
+        },
+        start() {
+          console.log('start')
+        },
+        openFile: function () {
+          document.getElementById('fileInput').click()
+        },
+        filterTag(value, row) {
+          return row.tag === value;
+        },
+        filterHandler(value, row, column) {
+          const property = column['property'];
+          return row[property] === value;
+        },
+        showRealPath: function () {
+          var files = document.getElementById('fileInput').files
+          var paths = ''
+          for (var i = 0; i < files.length; i++) {
+            paths += (files[i].path + '\n')
+          }
+          this.fileName = paths
+        }
+      },
+    };
+    const app = Vue.createApp(App);
+    app.use(ElementPlus);
+    app.mount("#app");
+  </script>
+</body>
+
+</html>

@@ -123,12 +123,25 @@
         allLog() {
           this.tableData = this.allData;
         },
-        filterError: function () {
+        analyse: function() {
+          var logs = 'MODULE|ACTION|EVENT|STATUS|INFO'
+          var logsSplit = logs.split('|')
+          var logObj = {
+              'module': logsSplit[0],
+              'action': logsSplit[1],              
+              'event': logsSplit[2],
+              'status': logsSplit[3],
+              'info': logsSplit[4]
+            }     
+          alert(logObj['module'])
+        },
+        filterError: function () {   
+          this.$options.methods.analyse();
           var datas1 = [{}]
           for (var i = 0; i < this.allData.length; i++) {
             if (this.allData[i]['status'] == 'Fail') {
               datas1.push(this.allData[i]);
-            };
+            }
           }
           this.tableData = datas1
         },
@@ -137,6 +150,7 @@
         },
         openFile: function () {
           document.getElementById('fileInput').click()
+          analyse()
         },
         filterTag(value, row) {
           return row.tag === value;

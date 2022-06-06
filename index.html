@@ -8,7 +8,22 @@
   <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
   <!-- import JavaScript -->
   <script src="https://unpkg.com/element-plus"></script>
+  <script src="./default.js"></script>
+
+  <style>
+    .el-table .cell {
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      line-break: auto;
+      max-lines: 1;
+      max-width: 180px;
+      font-size: small;
+      line-height: 40px;
+    }
+  </style>
   <title>日志分析终端</title>
+
 </head>
 
 <body>
@@ -19,9 +34,6 @@
       <el-button type="primary" v-on:click="openFile()" round>选择文件</el-button>
       <input type="file" id="fileInput" style="display:none" @change="showRealPath" />
     </div>
-    <div>
-      <!-- <input id="input01" type="file" @change="showRealPath" /> -->
-    </div>
     <p></p>
 
     <el-button @click="allLog">所有日志</el-button>
@@ -29,25 +41,36 @@
     <el-button @click="clearFilter">清除所有过滤器</el-button>
     <el-input v-model="input" placeholder="请输入内容" style="width: 200; margin-left: 15;" size="medium"></el-input>
     <p></p>
-    <el-table ref="filterTable" :data="tableData" style="width: 100%" id="filterTable">
-      <el-table-column prop="date" label="时间" sortable width="180" column-key="date"
-        :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
-        :filter-method="filterHandler">
+    <el-table class="tableBox" ref="filterTable" :row-style="rowStyle" :cell-style="{padding: '5'}" :data="tableData"
+      style="width: 100%; height: 50%; line-height: 30px; max-lines: 1;" id="filterTable">
+      <el-table-column prop="time" label="时间" sortable width="150" height="30" style="height: 30; max-lines: 1;"
+        column-key="date">
       </el-table-column>
-      <el-table-column prop="module" label="模块" width="180">
+      <el-table-column prop="code" label="位置" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        min-width="180">
       </el-table-column>
-      <el-table-column prop="event" label="事件" width="180">
+      <el-table-column prop="module" label="模块" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        width="180">
       </el-table-column>
-      <el-table-column prop="stage" label="阶段" width="180">
+      <el-table-column prop="action" label="事件" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        min-width="180">
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="180">
+      <el-table-column prop="stage" label="阶段" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        min-width="180">
       </el-table-column>
-      <el-table-column prop="info" label="附加信息" width="180">
+      <el-table-column prop="status" label="状态" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        width="180">
       </el-table-column>
-      <el-table-column prop="tag" label="日志等级" width="100" :filters="logLevel" :filter-method="filterTag"
-        filter-placement="bottom-end">
+      <el-table-column prop="info" label="备注" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        min-width="180">
+      </el-table-column>
+      <el-table-column prop="level" label="等级" style="height: 30px; word-wrap: break-word; max-lines: 1;" height="30"
+        width="100" :filters="logLevel" :filter-method="filterTag" filter-placement="bottom-end">
       </el-table-column>
     </el-table>
+    <div align="center">
+      <p>控制台</p>
+    </div>
   </div>
   <script>
     const App = {
@@ -58,61 +81,44 @@
           tableData: [],
           logLevel: [{
               text: 'ERROR',
-              value: 'ERROR'
+              value: '[E]'
             },
             {
               text: 'WARNING',
-              value: 'WARNING'
+              value: '[W]'
             },
             {
               text: 'VERBOSE',
-              value: 'VERBOSE'
+              value: '[V]'
             },
             {
               text: 'DEBUG',
-              value: 'DEBUG'
+              value: '[D]'
             },
             {
               text: 'INFO',
-              value: 'INFO'
+              value: '[I]'
             }
           ],
-          allData: [{
-            date: '2016-05-02',
-            module: 'WebKit',
-            event: 'beginLoad',
-            stage: 'willLoad',
-            status: 'Succ',
-            info: 'url = https://www.kdocs.cn/m',
-            tag: 'ERROR'
-          }, {
-            date: '2016-05-04',
-            module: 'WebKit',
-            event: 'beginLoad',
-            stage: 'didUpdateProgress',
-            status: 'Succ',
-            info: 'url = https://www.kdocs.cn/m',
-            tag: 'WARNING'
-          }, {
-            date: '2016-05-01',
-            module: 'WebKit',
-            event: 'beginLoad',
-            stage: 'decidePolicyForNavigationAction',
-            status: 'Succ',
-            info: 'url = https://www.kdocs.cn/m',
-            tag: 'VERBOSE'
-          }, {
-            date: '2016-05-03',
-            module: 'WebKit',
-            event: 'beginLoad',
-            stage: 'didReceiveChallenge',
-            status: 'Fail',
-            info: 'url = https://www.kdocs.cn/m',
-            tag: 'DEBUG'
-          }]
+          allData: []
         }
       },
       methods: {
+        rowStyle({
+          row,
+          rowIndex
+        }) {
+          let stylejson = {
+
+          }
+
+          if (row.level == "[E]") {
+            stylejson.color = 'red'
+            return stylejson
+          } else {
+            return ''
+          }
+        },
         clearFilter() {
           this.$refs.filterTable.clearFilter();
           this.tableData = this.allData;
@@ -123,37 +129,24 @@
         allLog() {
           this.tableData = this.allData;
         },
-        analyse: function() {
-          var logs = 'MODULE|ACTION|EVENT|STATUS|INFO'
-          var logsSplit = logs.split('|')
-          var logObj = {
-              'module': logsSplit[0],
-              'action': logsSplit[1],              
-              'event': logsSplit[2],
-              'status': logsSplit[3],
-              'info': logsSplit[4]
-            }     
-          alert(logObj['module'])
+        analyse: function () {
+
         },
-        filterError: function () {   
-          this.$options.methods.analyse();
+        filterError: function () {
           var datas1 = [{}]
           for (var i = 0; i < this.allData.length; i++) {
-            if (this.allData[i]['status'] == 'Fail') {
+            if (this.allData[i]['level'] == '[E]') {
               datas1.push(this.allData[i]);
             }
           }
           this.tableData = datas1
-        },
-        start() {
-          console.log('start')
         },
         openFile: function () {
           document.getElementById('fileInput').click()
           analyse()
         },
         filterTag(value, row) {
-          return row.tag === value;
+          return row.level === value;
         },
         filterHandler(value, row, column) {
           const property = column['property'];
@@ -163,9 +156,15 @@
           var files = document.getElementById('fileInput').files
           var paths = ''
           for (var i = 0; i < files.length; i++) {
-            paths += (files[i].path + '\n')
+            paths += (files[i].name + '\n')
           }
           this.fileName = paths
+          const reader = new FileReader()
+          reader.readAsText(files[0], 'utf8')
+          reader.onload = (event) => {
+            this.allData = logAnalyse(event.target.result)
+            this.tableData = logAnalyse(event.target.result)
+          }
         }
       },
     };

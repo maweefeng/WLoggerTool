@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "element-ui": "^2.15.8",
-    "vue": "^3.2.36"
+    "vue": "^3.2.36",
+    "vue-elementui-skeleton": "^1.0.2"
   }
 }
